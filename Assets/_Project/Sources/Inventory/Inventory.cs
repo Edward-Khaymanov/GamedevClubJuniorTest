@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace ClubTest
 {
@@ -78,8 +79,15 @@ namespace ClubTest
 
         public void Remove(int itemId, int amount)
         {
+            if (amount < 0)
+                return;
+
             var item = _items.FirstOrDefault(x => x.Id == itemId);
+            if (item == null)
+                return;
+
             item.Remove(amount);
+
             if (item.Amount == 0)
             {
                 _items.Remove(item);
@@ -91,14 +99,20 @@ namespace ClubTest
             }
         }
 
-        private void ShowContextMenu(int itemId, Vector2 position)
+        private void ShowContextMenu(int itemId, PointerEventData eventData)
         {
             var item = _items.FirstOrDefault(x => x.Id == itemId);
             if (item == null)
                 return;
 
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                (RectTransform)_view.transform,
+                eventData.position,
+                eventData.pressEventCamera,
+                out Vector2 localPoint);
+
             var options = item.GetContextMenuOptions();
-            _itemContextMenu.Show(item.Id, item.Asset.MaxInStack, options, position);
+            _itemContextMenu.Show(item.Id, item.Asset.MaxInStack, options, localPoint);
         }
 
         private List<InventoryItem> CreateItemsByStackSize(ItemAsset asset, int totalAmount)

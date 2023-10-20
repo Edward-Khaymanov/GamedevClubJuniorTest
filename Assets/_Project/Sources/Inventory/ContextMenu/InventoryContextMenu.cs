@@ -49,7 +49,7 @@ namespace ClubTest
             Hide();
             _currentItemId = itemId;
             _currentItemMaxStack = maxInStack;
-            ((RectTransform)transform).anchoredPosition = position;
+            ((RectTransform)transform).localPosition = position;
 
             foreach (var optionType in optionTypes)
             {

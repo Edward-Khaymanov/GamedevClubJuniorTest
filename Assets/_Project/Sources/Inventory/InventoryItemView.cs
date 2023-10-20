@@ -11,7 +11,7 @@ namespace ClubTest
         [SerializeField] private Image _itemIcon;
         [SerializeField] private TMP_Text _amountText;
 
-        public event Action<int, Vector2> ItemClicked;
+        public event Action<int, PointerEventData> ItemClicked;
 
         public int ItemId { get; private set; }
 
@@ -27,7 +27,7 @@ namespace ClubTest
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            ItemClicked?.Invoke(ItemId, eventData.position);
+            ItemClicked?.Invoke(ItemId, eventData);
         }
     }
 }

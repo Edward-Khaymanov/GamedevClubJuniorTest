@@ -76,13 +76,13 @@ namespace ClubTest
 
         private void FixedUpdate()
         {
+            _rigidbody.velocity = Vector2.zero;
             var direction = _input.Player.Move.ReadValue<Vector2>();
             if (direction == Vector2.zero)
                 return;
 
             Move(_stats.MoveSpeed * Time.fixedDeltaTime * direction);
             HandleRotation(direction);
-            _rigidbody.velocity = Vector2.zero;
         }
 
         public PlayerSaveData GetSaveData()

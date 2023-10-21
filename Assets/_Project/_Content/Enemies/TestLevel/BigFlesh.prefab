@@ -52,9 +52,9 @@ MonoBehaviour:
   _view: {fileID: 3748313292232481909}
   _rigidbody: {fileID: 3329902139762243438}
   _data:
-    <AttackTimeInSeconds>k__BackingField: 2
+    <AttackTimeInSeconds>k__BackingField: 0.5
     <AttackDelayInSeconds>k__BackingField: 3
-    <AttackDistance>k__BackingField: 1.2
+    <AttackDistance>k__BackingField: 1.4
     <Damage>k__BackingField: 100
     <UnitStats>k__BackingField:
       <Healf>k__BackingField:

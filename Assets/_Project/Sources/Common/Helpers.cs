@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ClubTest
 {
-    public static class Extensions
+    public static class Helpers
     {
         public static void DestroyChilds(this Transform target)
         {
@@ -12,6 +12,11 @@ namespace ClubTest
             {
                 GameObject.Destroy(child.gameObject);
             }
+        }
+
+        public static Vector2 GetRandomPointBeetween(Vector2 min, Vector2 max)
+        {
+            return new Vector2(Random.Range(min.x, max.x), Random.Range(min.y, max.y));
         }
 
         public static T RandomSingle<T>(this IEnumerable<T> source)

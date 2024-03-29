@@ -6,26 +6,26 @@ namespace ClubTest
     {
         public override void InstallBindings()
         {
-            BindSaveSystem();
-            BindItemProvider();
+            BindSaveLoadService();
+            BindItemService();
         }
 
-        private void BindItemProvider()
+        private void BindItemService()
         {
-            var provider = new ItemProvider();
-            provider.Initialize();
+            var service = new ItemService();
+            service.Initialize();
             Container
-                .Bind<ItemProvider>()
-                .FromInstance(provider)
+                .Bind<ItemService>()
+                .FromInstance(service)
                 .AsSingle()
                 .NonLazy();
         }
 
-        private void BindSaveSystem()
+        private void BindSaveLoadService()
         {
             Container
-                .Bind<SaveLoadProvider>()
-                .FromInstance(new SaveLoadProvider())
+                .Bind<SaveLoadService>()
+                .FromInstance(new SaveLoadService())
                 .AsSingle()
                 .NonLazy();
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ClubTest
 {
-    public class ItemProvider
+    public class ItemService
     {
         private IEnumerable<ItemAsset> _items;
 

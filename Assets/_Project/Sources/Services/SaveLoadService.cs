@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace ClubTest
 {
-    public class SaveLoadProvider
+    public class SaveLoadService
     {
-        public string PlayerSavePath => Path.Combine(Application.persistentDataPath, CONSTANTS.PLAYER_SAVE_FILE_NAME);
+        private string PlayerSavePath => Path.Combine(Application.persistentDataPath, CONSTANTS.PLAYER_SAVE_FILE_NAME);
         
         public PlayerSaveData LoadPlayer()
         {

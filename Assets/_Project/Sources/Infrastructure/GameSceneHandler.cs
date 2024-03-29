@@ -19,21 +19,21 @@ namespace ClubTest
         [SerializeField] private Button _deleteSaveButton;
 
 
-        private SaveLoadProvider _saveSystem;
+        private SaveLoadService _saveLoadService;
         private EnemyFactory _enemyFactory;
         private PlayerFactory _playerFactory;
-        private ItemProvider _itemProvider;
+        private ItemService _itemService;
 
         private Player _player;
 
 
         [Inject]
-        public void Construct(SaveLoadProvider saveSystem, EnemyFactory enemyFactory, PlayerFactory playerFactory, ItemProvider itemProvider)
+        public void Construct(SaveLoadService saveLoadService, EnemyFactory enemyFactory, PlayerFactory playerFactory, ItemService itemService)
         {
-            _saveSystem = saveSystem;
+            _saveLoadService = saveLoadService;
             _enemyFactory = enemyFactory;
             _playerFactory = playerFactory;
-            _itemProvider = itemProvider;
+            _itemService = itemService;
         }
 
         private void Start()
@@ -68,7 +68,7 @@ namespace ClubTest
 
             try
             {
-                var playerDataSave = _saveSystem.LoadPlayer();
+                var playerDataSave = _saveLoadService.LoadPlayer();
                 playerData = new PlayerData()
                 {
                     Stats = playerDataSave.Stats,
@@ -78,7 +78,7 @@ namespace ClubTest
 
                 foreach (var saveItem in playerDataSave.InventoryItems)
                 {
-                    var itemAsset = _itemProvider.GetItemById<ItemAsset>(saveItem.AssetId);
+                    var itemAsset = _itemService.GetItemById<ItemAsset>(saveItem.AssetId);
                     var item = new InventoryItem(saveItem.Id, saveItem.Amount, itemAsset);
                     playerData.InventoryItems.Add(item);
                 }
@@ -108,12 +108,12 @@ namespace ClubTest
 
         private void SaveData()
         {
-            _saveSystem.SavePlayer(_player.GetSaveData());
+            _saveLoadService.SavePlayer(_player.GetSaveData());
         }
 
         private void DeleteSaveData()
         {
-            _saveSystem.DeletePlayer();
+            _saveLoadService.DeletePlayer();
         }
 
     }

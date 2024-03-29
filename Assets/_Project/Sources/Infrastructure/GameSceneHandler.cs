@@ -8,7 +8,6 @@ namespace ClubTest
 {
     public class GameSceneHandler : MonoBehaviour
     {
-        [SerializeField] private LevelData _levelData;
         [SerializeField] private Transform _minSpawnPoint;
         [SerializeField] private Transform _maxSpawnPoint;
         [SerializeField] private PlayerData _defaultPlayerData;
@@ -23,16 +22,25 @@ namespace ClubTest
         private EnemyFactory _enemyFactory;
         private PlayerFactory _playerFactory;
         private ItemService _itemService;
-
+        private DropedItemView _dropedItemTemplate;
         private Player _player;
+        private LevelData _levelData;
 
         [Inject]
-        public void Construct(SaveLoadService saveLoadService, EnemyFactory enemyFactory, PlayerFactory playerFactory, ItemService itemService)
+        public void Construct(
+            SaveLoadService saveLoadService,
+            EnemyFactory enemyFactory,
+            PlayerFactory playerFactory,
+            ItemService itemService,
+            LevelData levelData,
+            DropedItemView dropedItemView)
         {
             _saveLoadService = saveLoadService;
             _enemyFactory = enemyFactory;
             _playerFactory = playerFactory;
             _itemService = itemService;
+            _levelData = levelData;
+            _dropedItemTemplate = dropedItemView;
         }
 
         private void Start()
@@ -53,11 +61,6 @@ namespace ClubTest
             _saveButton.onClick.RemoveListener(SaveData);
             _reloadButton.onClick.RemoveListener(ReloadLevel);
             _deleteSaveButton.onClick.RemoveListener(DeleteSaveData);
-        }
-
-        private void OnApplicationQuit()
-        {
-            // здесь могло быть сохранение
         }
 
         private void SpawnPlayer()
@@ -98,7 +101,8 @@ namespace ClubTest
                 for (var i = 0; i < enemyTypeAmount.Value; i++)
                 {
                     var position = Helpers.GetRandomPointBeetween(_minSpawnPoint.position, _maxSpawnPoint.position);
-                    _enemyFactory.Spawn(enemyTypeAmount.Key, position);
+                    var enemy = _enemyFactory.Spawn(enemyTypeAmount.Key, position);
+                    enemy.Died += OnEnemyDeath;
                 }
             }
         }
@@ -116,6 +120,14 @@ namespace ClubTest
         private void DeleteSaveData()
         {
             _saveLoadService.DeletePlayer();
+        }
+
+        private void OnEnemyDeath(Enemy enemy)
+        {
+            var dropItem = _levelData.EnemyDropList[enemy.Type].RandomSingle();
+            var dropItemView = GameObject.Instantiate(_dropedItemTemplate, enemy.transform.position, Quaternion.identity);
+            dropItemView.Init(dropItem);
+            _enemyFactory.Despawn(enemy);
         }
     }
 }

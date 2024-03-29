@@ -5,7 +5,7 @@ namespace ClubTest
     [SelectionBase]
     public abstract class Unit : MonoBehaviour, IDamageable
     {
-        [SerializeField] protected ProgressBar HealfBar;
+        [field: SerializeField] protected ProgressBar HealfBar { get; private set; }
 
         public abstract void TakeDamage(float damage);
         protected abstract void Move(Vector2 position);

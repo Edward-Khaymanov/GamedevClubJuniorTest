@@ -12,10 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d901b8e253bca9a419ce58a3f17986e9, type: 3}
   m_Name: 1LevelData
   m_EditorClassIdentifier: 
-  <LevelId>k__BackingField: 0
   <EnemyTypeAmountToSpawn>k__BackingField:
-    _serializedList: []
+    _serializedList:
+    - Key: 0
+      Value: 3
   <EnemyDropList>k__BackingField:
-    _serializedList: []
-  <MinSpawnPoint>k__BackingField: {fileID: 0}
-  <MaxSpawnPoint>k__BackingField: {fileID: 0}
+    _serializedList:
+    - Key: 0
+      Value:
+      - <Item>k__BackingField: {fileID: 11400000, guid: 16fca2fb1ff48bd4e90e775692ad83a7, type: 2}
+        <Amount>k__BackingField: 1
+      - <Item>k__BackingField: {fileID: 11400000, guid: fd16e30cad21fe246b575d038cfa7aff, type: 2}
+        <Amount>k__BackingField: 20

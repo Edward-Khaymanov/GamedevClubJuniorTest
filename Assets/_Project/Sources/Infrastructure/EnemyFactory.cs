@@ -16,7 +16,13 @@ namespace ClubTest
         {
             var template = _templates[enemyType];
             var enemy = GameObject.Instantiate(template, position, Quaternion.identity);
+            enemy.Init(enemyType);
             return enemy;
+        }
+
+        public void Despawn(Enemy enemy)
+        {
+            GameObject.Destroy(enemy.gameObject);
         }
     }
 }

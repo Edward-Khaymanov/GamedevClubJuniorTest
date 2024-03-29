@@ -15,6 +15,7 @@ namespace ClubTest
         public static readonly LayerMask PlayerMask = LayerMask.GetMask("Player");
 
         public const string ITEMS_PATH = "Items/";
+        public const string ENEMY_TEMPLATES_PATH = "EnemyTemplates";
 
         public const int SCENE_GAME_INDEX = 1;
     }

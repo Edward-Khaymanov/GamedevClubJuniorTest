@@ -24,9 +24,11 @@ namespace ClubTest
 
         private void BindEnemyFactory()
         {
+            var templates = Resources.Load<EnemyTemplates>(CONSTANTS.ENEMY_TEMPLATES_PATH);
+            var factory = new EnemyFactory(templates.Templates);
             Container
                 .Bind<EnemyFactory>()
-                .To<EnemyFactory>()
+                .FromInstance(factory)
                 .AsSingle()
                 .NonLazy();
         }

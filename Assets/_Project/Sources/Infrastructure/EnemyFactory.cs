@@ -1,20 +1,21 @@
-﻿using UnityEngine;
-using Zenject;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace ClubTest
 {
     public class EnemyFactory
     {
-        private readonly DiContainer _diContainer;
+        private readonly IDictionary<EnemyType, Enemy> _templates;
 
-        public EnemyFactory(DiContainer diContainer)
+        public EnemyFactory(IDictionary<EnemyType, Enemy> enemyTemplates)
         {
-            _diContainer = diContainer;
+            _templates = enemyTemplates;
         }
 
-        public Enemy Spawn(Vector2 position, Enemy enemyTemplate)
+        public Enemy Spawn(EnemyType enemyType, Vector2 position)
         {
-            var enemy = _diContainer.InstantiatePrefabForComponent<Enemy>(enemyTemplate, position, Quaternion.identity, null);
+            var template = _templates[enemyType];
+            var enemy = GameObject.Instantiate(template, position, Quaternion.identity);
             return enemy;
         }
     }

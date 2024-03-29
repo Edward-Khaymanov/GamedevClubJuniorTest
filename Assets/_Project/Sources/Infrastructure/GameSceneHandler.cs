@@ -8,7 +8,7 @@ namespace ClubTest
 {
     public class GameSceneHandler : MonoBehaviour
     {
-        [SerializeField] private List<Enemy> _enemyToSpawn;
+        [SerializeField] private LevelData _levelData;
         [SerializeField] private Transform _minSpawnPoint;
         [SerializeField] private Transform _maxSpawnPoint;
         [SerializeField] private PlayerData _defaultPlayerData;
@@ -25,7 +25,6 @@ namespace ClubTest
         private ItemService _itemService;
 
         private Player _player;
-
 
         [Inject]
         public void Construct(SaveLoadService saveLoadService, EnemyFactory enemyFactory, PlayerFactory playerFactory, ItemService itemService)
@@ -94,10 +93,13 @@ namespace ClubTest
 
         private void SpawnEnemyAtRandomPosition()
         {
-            foreach (var enemyTemplate in _enemyToSpawn)
+            foreach (var enemyTypeAmount in _levelData.EnemyTypeAmountToSpawn)
             {
-                var position = new Vector2(Random.Range(_minSpawnPoint.position.x, _maxSpawnPoint.position.x), Random.Range(_minSpawnPoint.position.y, _maxSpawnPoint.position.y));
-                _enemyFactory.Spawn(position, enemyTemplate);
+                for (var i = 0; i < enemyTypeAmount.Value; i++)
+                {
+                    var position = Helpers.GetRandomPointBeetween(_minSpawnPoint.position, _maxSpawnPoint.position);
+                    _enemyFactory.Spawn(enemyTypeAmount.Key, position);
+                }
             }
         }
 
@@ -115,6 +117,5 @@ namespace ClubTest
         {
             _saveLoadService.DeletePlayer();
         }
-
     }
 }

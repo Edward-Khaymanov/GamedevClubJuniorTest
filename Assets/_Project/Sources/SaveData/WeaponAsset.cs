@@ -2,7 +2,7 @@
 
 namespace ClubTest
 {
-    [CreateAssetMenu(fileName = "Weapon", menuName = "Items/Weapon")]
+    [CreateAssetMenu(menuName = "_Project/Items/Weapon")]
     public class WeaponAsset : ItemAsset
     {
         [field: SerializeField] public WeaponStats Stats { get; set; }

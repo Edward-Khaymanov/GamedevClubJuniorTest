@@ -2,7 +2,6 @@
 
 namespace ClubTest
 {
-    [CreateAssetMenu(fileName = "Item", menuName = "Items/Item")]
     public abstract class ItemAsset : ScriptableObject
     {
         [field: SerializeField] public int Id { get; set; }

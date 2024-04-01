@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -11,35 +10,14 @@ namespace ClubTest
 
         public PlayerSaveData LoadPlayer()
         {
-            var jsonSettings = new JsonSerializerSettings()
-            {
-                MissingMemberHandling = MissingMemberHandling.Error,
-            };
             var playerJson = File.ReadAllText(PlayerSavePath);
-            var player = JsonConvert.DeserializeObject<PlayerSaveData>(playerJson, jsonSettings);
-            return player;
+            return DeserializePlayerJson(playerJson);
         }
 
         public PlayerSaveData LoadPlayerDefault()
         {
-            return new PlayerSaveData()
-            {
-                Stats = new UnitStats() 
-                { 
-                    FOVDistance = 3, 
-                    Healf = new Healf(500), 
-                    MoveSpeed = 6 
-                },
-                Inventory = new List<InventoryCellData>()
-                {
-                    new InventoryCellData() { Id = 1, Amount = 1, ItemDefinitionId = 2 },
-                    new InventoryCellData() { Id = 2, Amount = 30, ItemDefinitionId = 3 }
-                },
-                EquipedItemsInventoryId = new List<int>()
-                {
-                    1
-                }
-            };
+            var file = Resources.Load<TextAsset>(CONSTANTS.DEFAULT_PLAYER_PATH);
+            return DeserializePlayerJson(file.text);
         }
 
         public void SavePlayer(PlayerSaveData playerData)
@@ -52,6 +30,16 @@ namespace ClubTest
         {
             if (File.Exists(PlayerSavePath))
                 File.Delete(PlayerSavePath);
+        }
+
+        private PlayerSaveData DeserializePlayerJson(string json)
+        {
+            var jsonSettings = new JsonSerializerSettings()
+            {
+                MissingMemberHandling = MissingMemberHandling.Error,
+            };
+            var player = JsonConvert.DeserializeObject<PlayerSaveData>(json, jsonSettings);
+            return player;
         }
     }
 }

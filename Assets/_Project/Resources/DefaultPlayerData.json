@@ -1,0 +1,25 @@
+{
+    "EquipedItemsInventoryId": [
+        1
+    ],
+    "Inventory": [
+        {
+            "Amount": 1,
+            "Id": 1,
+            "ItemDefinitionId": 2
+        },
+		{
+            "Amount": 60,
+            "Id": 2,
+            "ItemDefinitionId": 3
+        }
+    ],
+    "Stats": {
+        "FOVDistance": 3.0,
+        "Healf": {
+            "Current": 500.0,
+            "Max": 500.0
+        },
+        "MoveSpeed": 5.0
+    }
+}

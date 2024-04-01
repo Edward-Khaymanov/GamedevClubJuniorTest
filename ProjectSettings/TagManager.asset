@@ -16,7 +16,7 @@ TagManager:
   - 
   - Bullet
   - DroppedItem
-  - 
+  - MoveCollider
   - 
   - 
   - 
@@ -38,12 +38,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Level
-    uniqueID: 4079230133
-    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
   - name: Unit
     uniqueID: 4128191245
+    locked: 0
+  - name: Bars
+    uniqueID: 3371640919
     locked: 0

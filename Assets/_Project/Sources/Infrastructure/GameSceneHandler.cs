@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace ClubTest
 {
@@ -10,13 +13,11 @@ namespace ClubTest
     {
         [SerializeField] private Transform _minSpawnPoint;
         [SerializeField] private Transform _maxSpawnPoint;
-        [SerializeField] private PlayerData _defaultPlayerData;
         [SerializeField] private Transform _defaultPlayerPosition;
         [SerializeField] private CameraFollower _playerCamera;
         [SerializeField] private Button _saveButton;
         [SerializeField] private Button _reloadButton;
         [SerializeField] private Button _deleteSaveButton;
-
 
         private SaveLoadService _saveLoadService;
         private EnemyFactory _enemyFactory;
@@ -25,6 +26,10 @@ namespace ClubTest
         private DropedItemView _dropedItemTemplate;
         private Player _player;
         private LevelData _levelData;
+        private InventoryContextMenu _inventoryContextMenu;
+        private InventoryView _inventoryView;
+        private Inventory _inventory;
+        private IPlayerInput _input;
 
         [Inject]
         public void Construct(
@@ -33,7 +38,10 @@ namespace ClubTest
             PlayerFactory playerFactory,
             ItemService itemService,
             LevelData levelData,
-            DropedItemView dropedItemView)
+            DropedItemView dropedItemView,
+            InventoryView inventoryView,
+            InventoryContextMenu inventoryContextMenu,
+            IPlayerInput playerInput)
         {
             _saveLoadService = saveLoadService;
             _enemyFactory = enemyFactory;
@@ -41,56 +49,72 @@ namespace ClubTest
             _itemService = itemService;
             _levelData = levelData;
             _dropedItemTemplate = dropedItemView;
+            _inventoryContextMenu = inventoryContextMenu;
+            _inventoryView = inventoryView;
+            _input = playerInput;
         }
 
         private void Start()
         {
-            SpawnPlayer();
+            var playerSaveData = _saveLoadService.LoadPlayer();
+            InitInventory(playerSaveData.Inventory);
+            SpawnPlayer(playerSaveData);
             SpawnEnemyAtRandomPosition();
-        }
 
-        private void OnEnable()
-        {
             _saveButton.onClick.AddListener(SaveData);
             _reloadButton.onClick.AddListener(ReloadLevel);
             _deleteSaveButton.onClick.AddListener(DeleteSaveData);
+
+            _inventory.CellAdded += _inventoryView.AddView;
+            _inventory.CellUpdated += _inventoryView.UpdateView;
+            _inventory.CellRemoved += _inventoryView.RemoveView;
+
+            _inventoryContextMenu.EquipRequested += _player.EquipItem;
+            _inventoryContextMenu.DeleteRequested += _inventory.Remove;
+            _input.InventoryOpen += _inventoryView.Show;
+            _input.InventoryClose += _inventoryView.Hide;
+            _input.Enable();
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             _saveButton.onClick.RemoveListener(SaveData);
             _reloadButton.onClick.RemoveListener(ReloadLevel);
             _deleteSaveButton.onClick.RemoveListener(DeleteSaveData);
+
+            _inventory.CellAdded -= _inventoryView.AddView;
+            _inventory.CellUpdated -= _inventoryView.UpdateView;
+            _inventory.CellRemoved -= _inventoryView.RemoveView;
+
+            _inventoryContextMenu.EquipRequested -= _player.EquipItem;
+            _inventoryContextMenu.DeleteRequested -= _inventory.Remove;
+            _input.InventoryOpen += _inventoryView.Show;
+            _input.InventoryClose += _inventoryView.Hide;
+            _input.Disable();
         }
 
-        private void SpawnPlayer()
+        private void InitInventory(List<InventoryCellData> savedInventory)
         {
-            var playerData = default(PlayerData);
-            var spawnPosition = _defaultPlayerPosition.position;
+            var inventoryCells = new List<InventoryCell>();
 
-            try
+            foreach (var savedInventoryCell in savedInventory)
             {
-                var playerDataSave = _saveLoadService.LoadPlayer();
-                playerData = new PlayerData()
-                {
-                    Stats = playerDataSave.Stats,
-                    InventoryItems = new List<InventoryItem>(),
-                    EquipedWeaponInventoryItemId = playerDataSave.EquipedWeaponInventoryItemId
-                };
-
-                foreach (var saveItem in playerDataSave.InventoryItems)
-                {
-                    var itemAsset = _itemService.GetItemById<ItemAsset>(saveItem.AssetId);
-                    var item = new InventoryItem(saveItem.Id, saveItem.Amount, itemAsset);
-                    playerData.InventoryItems.Add(item);
-                }
+                var itemDefinition = _itemService.GetItemById<ItemDefinition>(savedInventoryCell.ItemDefinitionId);
+                var cell = new InventoryCell(savedInventoryCell.Id, savedInventoryCell.Amount, itemDefinition);
+                inventoryCells.Add(cell);
             }
-            catch (System.Exception)
+            _inventory = new Inventory(inventoryCells);
+
+            foreach (var cell in _inventory.Cells)
             {
-                playerData = _defaultPlayerData;
+                _inventoryView.AddView(cell);
             }
+        }
 
-            _player = _playerFactory.Spawn(playerData, spawnPosition);
+        private void SpawnPlayer(PlayerSaveData playerData)
+        {
+            _player = _playerFactory.Spawn(playerData, _inventory, _input, _defaultPlayerPosition.position);
+            _player.Died += OnPlayerDeath;
             _playerCamera.SetTarget(_player.transform);
         }
 
@@ -122,12 +146,36 @@ namespace ClubTest
             _saveLoadService.DeletePlayer();
         }
 
+        private void ShowDeathScreen()
+        {
+
+        }
+
+
         private void OnEnemyDeath(Enemy enemy)
         {
+            enemy.Died -= OnEnemyDeath;
             var dropItem = _levelData.EnemyDropList[enemy.Type].RandomSingle();
             var dropItemView = GameObject.Instantiate(_dropedItemTemplate, enemy.transform.position, Quaternion.identity);
             dropItemView.Init(dropItem);
+            dropItemView.PickedUp += OnPlayerPickItem;
             _enemyFactory.Despawn(enemy);
+        }
+
+        private void OnPlayerPickItem(DropedItemView itemView, ItemAmount drop)
+        {
+            itemView.PickedUp -= OnPlayerPickItem;
+            _inventory.Add(drop.Item, drop.Amount);
+            GameObject.Destroy(itemView.gameObject);
+        }
+
+        private void OnPlayerDeath(Player player)
+        {
+            player.Died -= OnPlayerDeath;
+            _input.Disable();
+            _inventoryView.Hide();
+            GameObject.Destroy(player.gameObject);
+            ShowDeathScreen();
         }
     }
 }

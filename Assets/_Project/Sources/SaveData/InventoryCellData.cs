@@ -5,10 +5,10 @@ namespace ClubTest
 {
     [Serializable]
     [JsonObject(MemberSerialization.OptOut)]
-    public struct InventoryItemSaveData
+    public class InventoryCellData
     {
         public int Id { get; set; }
-        public int AssetId { get; set; }
+        public int ItemDefinitionId { get; set; }
         public int Amount { get; set; }
     }
 }

@@ -100,15 +100,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96f3753d041de11448572fe88359bbf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HealfBar: {fileID: 6124554094175269389}
-  _rigidbody: {fileID: 2737514446807765521}
+  <HealfBar>k__BackingField: {fileID: 6124554094175269389}
+  <Rigidbody>k__BackingField: {fileID: 2737514446807765521}
   _view: {fileID: 6785696552067422151}
-  _stats:
-    <Healf>k__BackingField:
-      <Max>k__BackingField: 0
-      <Current>k__BackingField: 0
-    <FOVRadius>k__BackingField: 0
-    <MoveSpeed>k__BackingField: 0
 --- !u!70 &5713672384709835624
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

@@ -14,9 +14,9 @@ namespace ClubTest
             }
         }
 
-        public static Vector2 GetRandomPointBeetween(Vector2 min, Vector2 max)
+        public static Vector2 GetRandomPointBeetween(Vector2 point1, Vector2 point2)
         {
-            return new Vector2(Random.Range(min.x, max.x), Random.Range(min.y, max.y));
+            return new Vector2(Random.Range(point1.x, point2.x), Random.Range(point1.y, point2.y));
         }
 
         public static T RandomSingle<T>(this IEnumerable<T> source)

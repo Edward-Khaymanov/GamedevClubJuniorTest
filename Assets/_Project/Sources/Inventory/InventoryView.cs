@@ -2,91 +2,109 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using Zenject;
 
 namespace ClubTest
 {
     public class InventoryView : MonoBehaviour, IPointerClickHandler
     {
+        [SerializeField] private Canvas _canvas;
         [SerializeField] private Transform _cellsContainer;
 
-        private Canvas _canvas;
-        private InventoryItemView _cellTemplate;
-        private List<InventoryItemView> _itemViews;
-        private SharedInput _input;
-        private InventoryContextMenu _itemContextMenu;
-
-        public IReadOnlyList<InventoryItemView> ItemViews => _itemViews;
+        private InventoryCellView _cellViewTemplate;
+        private InventoryContextMenu _contextMenu;
+        private List<InventoryCellView> _cellsViews;
 
         [Inject]
-        private void Construct(InventoryItemView ItemViewTemplate, InventoryContextMenu inventoryContextMenu)
+        private void Construct(InventoryContextMenu contextMenu, InventoryCellView cellViewTemplate)
         {
-            _cellTemplate = ItemViewTemplate;
-            _itemContextMenu = inventoryContextMenu;
-            _canvas = GetComponent<Canvas>();
-            _input = new SharedInput();
-            _itemViews = new List<InventoryItemView>();
+            _contextMenu = contextMenu;
+            _cellViewTemplate = cellViewTemplate;
+            _cellsViews = new List<InventoryCellView>();
         }
 
         private void OnEnable()
         {
-            _input.Enable();
-            _input.UI.Inventory.performed += (ctx) => SwitchState();
+            SubscribeContextMenu();
         }
 
         private void OnDisable()
         {
-            _input.Disable();
-            _input.UI.Inventory.performed -= (ctx) => SwitchState();
+            UnsubscribeContextMenu();
         }
 
-        public InventoryItemView Add(int itemId, Sprite icon, int amount)
+        public void AddView(InventoryCell cell)
         {
-            var cell = Instantiate(_cellTemplate, _cellsContainer);
-            cell.Render(itemId, icon, amount);
-            _itemViews.Add(cell);
-            return cell;
+            var view = Instantiate(_cellViewTemplate, _cellsContainer);
+            view.Render(cell);
+            view.Clicked += ShowContextMenu;
+            _cellsViews.Add(view);
         }
 
-        public void UpdateView(InventoryItem item)
+        public void UpdateView(InventoryCell cell)
         {
-            var cell = _itemViews.FirstOrDefault(x => x.ItemId == item.Id);
-            if (cell != null)
-                cell.Render(item.Id, item.Asset.Icon, item.Amount);
+            var view = _cellsViews.FirstOrDefault(x => x.CellId == cell.Id);
+            if (view != null)
+                view.Render(cell);
         }
 
-        public void Remove(int id)
+        public void RemoveView(int id)
         {
-            var cell = _itemViews.FirstOrDefault(x => x.ItemId == id);
-            if (cell == null)
+            var view = _cellsViews.FirstOrDefault(x => x.CellId == id);
+            if (view == null)
                 return;
 
-            _itemViews.Remove(cell);
-            Destroy(cell.gameObject);
+            view.Clicked -= ShowContextMenu;
+            _cellsViews.Remove(view);
+            Destroy(view.gameObject);
         }
 
-        private void SwitchState()
-        {
-            if (_canvas.enabled)
-                Hide();
-            else
-                Show();
-        }
-
-        private void Show()
+        public void Show()
         {
             _canvas.enabled = true;
         }
 
-        private void Hide()
+        public void Hide()
         {
             _canvas.enabled = false;
-            _itemContextMenu.Hide();
+            _contextMenu.Hide();
+        }
+
+        private void SubscribeContextMenu()
+        {
+            foreach (var view in _cellsViews)
+            {
+                view.Clicked += ShowContextMenu;
+            }
+        }
+        
+        private void UnsubscribeContextMenu()
+        {
+            foreach (var view in _cellsViews)
+            {
+                view.Clicked -= ShowContextMenu;
+            }
+        }
+
+        private void ShowContextMenu(int itemId, PointerEventData eventData)
+        {
+            var view = _cellsViews.FirstOrDefault(x => x.CellId == itemId);
+            if (view == null)
+                return;
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                (RectTransform)transform,
+                eventData.position,
+                eventData.pressEventCamera,
+                out Vector2 localPoint);
+
+            _contextMenu.Show(view.CellId, view.Amount, view.ContextMenuOptions, localPoint);
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _itemContextMenu.Hide();
+            _contextMenu.Hide();
         }
     }
 }

@@ -1,8 +1,8 @@
 {
-    "name": "SharedInput",
+    "name": "PlayerInputActions",
     "maps": [
         {
-            "name": "Player",
+            "name": "Game",
             "id": "20ed657c-9aab-435c-9196-159747641281",
             "actions": [
                 {
@@ -18,6 +18,15 @@
                     "name": "Shoot",
                     "type": "Button",
                     "id": "4096fce7-8120-4240-a730-f88bb8ed0cbf",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "OpenInventory",
+                    "type": "Button",
+                    "id": "e6a684de-47b2-4648-ab4d-b481f13a019e",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -37,7 +46,7 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "2D Vector",
+                    "name": "WASD",
                     "id": "33b0534e-3fa1-4b03-a362-144982d85d39",
                     "path": "2DVector",
                     "interactions": "",
@@ -101,21 +110,41 @@
                     "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b6234f5b-48da-4b7c-9e2d-cf927e873d8c",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenInventory",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
         {
-            "name": "UI",
+            "name": "Inventory",
             "id": "74ec74e6-9f3a-4e3c-8c11-f01a2cf0f761",
             "actions": [
                 {
-                    "name": "Inventory",
+                    "name": "CloseInventory",
                     "type": "Button",
                     "id": "f25fb125-7373-4ba0-a976-eed6f6a25189",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "f5ad7c9e-fbeb-40a4-90ff-948ddf91feea",
+                    "expectedControlType": "Vector2",
+                    "processors": "NormalizeVector2",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -126,9 +155,75 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Inventory",
+                    "action": "CloseInventory",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "06cfe03e-ae91-44e6-a474-0e1cf81568ce",
+                    "path": "<Joystick>/stick",
+                    "interactions": "",
+                    "processors": "StickDeadzone(min=0.3)",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "WASD",
+                    "id": "274c140b-4f99-406d-a56e-69995ae0a253",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "02bd160a-f96f-4746-a5db-85ef9eee9b49",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "b75ae17e-0a69-4199-a7c6-16dcbbe59351",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "07656391-8396-4e36-8625-e5a5b7cce4b4",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "0ad3abba-c8ee-4be1-a1a4-2ae7f341d0cc",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }

@@ -347,16 +347,15 @@ MonoBehaviour:
   <Rigidbody>k__BackingField: {fileID: -1713061700946478062}
   <Data>k__BackingField:
     <AttackTimeInSeconds>k__BackingField: 0.5
-    <AttackDelayInSeconds>k__BackingField: 0
-    <AttackDistance>k__BackingField: 0.37
+    <AttackCooldownInSeconds>k__BackingField: 1
+    <AttackDistance>k__BackingField: 1
     <Damage>k__BackingField: 20
     <UnitStats>k__BackingField:
       <Healf>k__BackingField:
         <Max>k__BackingField: 500
         <Current>k__BackingField: 500
-      <FOVRadius>k__BackingField: 0.59
+      <FOVDistance>k__BackingField: 2
       <MoveSpeed>k__BackingField: 2
-    <DropList>k__BackingField: []
 --- !u!50 &-1713061700946478062
 Rigidbody2D:
   serializedVersion: 4

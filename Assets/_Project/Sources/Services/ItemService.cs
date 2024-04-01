@@ -6,14 +6,14 @@ namespace ClubTest
 {
     public class ItemService
     {
-        private IEnumerable<ItemAsset> _items;
+        private IEnumerable<ItemDefinition> _items;
 
-        public void Initialize()
+        public ItemService(string itemsPath)
         {
-            _items = Resources.LoadAll<ItemAsset>(CONSTANTS.ITEMS_PATH);
+            _items = Resources.LoadAll<ItemDefinition>(itemsPath);
         }
 
-        public T GetItemById<T>(int itemId) where T : ItemAsset
+        public T GetItemById<T>(int itemId) where T : ItemDefinition
         {
             var result = default(T);
             var itemAsset = (T)_items.FirstOrDefault(x => x.Id == itemId);
@@ -24,7 +24,7 @@ namespace ClubTest
             return result;
         }
 
-        public IEnumerable<ItemAsset> GetItemsById(IEnumerable<int> itemsId)
+        public IEnumerable<ItemDefinition> GetItemsById(IEnumerable<int> itemsId)
         {
             return _items.Where(x => itemsId.Contains(x.Id));
         }

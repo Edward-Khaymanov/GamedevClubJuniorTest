@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5113851512938867504}
   m_Layer: 6
-  m_Name: GunPoint
+  m_Name: ShootPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5113851512938867511}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.074, y: 0.04, z: 0}
+  m_LocalPosition: {x: -0.0924, y: 0.0446, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -161,5 +161,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 449f0e11a97c5e54789134d48a527acb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gunPoint: {fileID: 5113851512938867504}
+  _shootPoint: {fileID: 5113851512938867504}
   _bulletTemplate: {fileID: 2540849594996247432, guid: 1d1bb9316241f3340ab55e188252f6f0, type: 3}

@@ -1,102 +1,87 @@
 using Cysharp.Threading.Tasks;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
-using Zenject;
+using UnityEngine.InputSystem;
 
 namespace ClubTest
 {
     public class Player : Unit
     {
-        [SerializeField] private Rigidbody2D _rigidbody;
         [SerializeField] private PlayerView _view;
-        [SerializeField] private UnitStats _stats;
 
+        private UnitStats _stats;
         private CancellationTokenSource _attackTokenSource;
-        private CancellationTokenSource _searchTokenSource;
-        private Inventory _inventory;
-        private SharedInput _input;
+        private IPlayerInput _input;
         private Unit _target;
         private UnitDelector _unitDetector;
         private Weapon _equipedWeapon;
-        private InventoryContextMenu _inventoryContextMenu;
+        private Inventory _inventory;
 
-        [Inject]
-        private void Construct(InventoryView inventoryView, InventoryContextMenu inventoryContextMenu)
+        public event Action<Player> Died;
+
+        private void Awake()
         {
-            _inventoryContextMenu = inventoryContextMenu;
-            _inventory = new Inventory(inventoryView, inventoryContextMenu);
             _unitDetector = new UnitDelector();
-            _input = new SharedInput();
             _attackTokenSource = new CancellationTokenSource();
-            _searchTokenSource = new CancellationTokenSource();
         }
 
-        public void Init(PlayerData data)
+        public void Init(PlayerSaveData playerData, Inventory inventory, IPlayerInput input)
         {
-            _stats = data.Stats;
-            _inventory.Init(data.InventoryItems);
+            _stats = playerData.Stats;
+            _inventory = inventory;
+            _input = input;
+
+            if (playerData.EquipedItemsInventoryId.Count > 0)
+            {
+                foreach (var cellId in playerData.EquipedItemsInventoryId)
+                {
+                    EquipItem(cellId);
+                }
+            }
+
+            _input.Shoot += OnShoot;
             _stats.Healf.HealfChanged += OnHealfChanged;
-            if (data.EquipedWeaponInventoryItemId.HasValue)
-                EquipItem(data.EquipedWeaponInventoryItemId.Value);
-        }
-
-        private void OnEnable()
-        {
-            _input.Enable();
-            _input.Player.Shoot.started += (ctx) => StartAttack(_attackTokenSource.Token).Forget();
-            _input.Player.Shoot.canceled += (ctx) => StopAttack();
-            _inventoryContextMenu.EquipRequested += EquipItem;
-            _inventoryContextMenu.DeleteRequested += OnDeleteRequested;
-            StartSearchEnemies(_searchTokenSource.Token).Forget();
-        }
-
-        private void OnDisable()
-        {
-            _input.Disable();
-            _input.Player.Shoot.started -= (ctx) => StartAttack(_attackTokenSource.Token).Forget();
-            _input.Player.Shoot.canceled -= (ctx) => StopAttack();
-            _inventoryContextMenu.EquipRequested -= EquipItem;
-            _inventoryContextMenu.DeleteRequested -= OnDeleteRequested;
-            StopSearchEnemies();
+            _inventory.CellRemoved += RemoveItem;
         }
 
         private void OnDestroy()
         {
+            _input.Shoot -= OnShoot;
             _stats.Healf.HealfChanged -= OnHealfChanged;
-            _inventory.Dispose();
+            _inventory.CellRemoved -= RemoveItem;
         }
 
-        private void OnDrawGizmos()
+        private void Update()
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(transform.position, _stats.FOVRadius);
-            Gizmos.color = Color.white;
+            var enemies = _unitDetector.GetComponentsAround<Enemy>(transform.position, _stats.FOVDistance, CONSTANTS.EnemyMask).ToList();
+            _target = enemies.GetClosestToPoint(transform.position);
+
+            if (_target != null)
+                RotateToDirection(_target.Position - Position);
         }
 
         private void FixedUpdate()
         {
-            _rigidbody.velocity = Vector2.zero;
-            var direction = _input.Player.Move.ReadValue<Vector2>();
-            if (direction == Vector2.zero)
+            var moveDirection = _input.MoveDirection;
+            if (moveDirection == Vector2.zero)
                 return;
 
-            Move(_stats.MoveSpeed * Time.fixedDeltaTime * direction);
-            HandleRotation(direction);
+            Move(_stats.MoveSpeed * Time.fixedDeltaTime * moveDirection);
+
+            if (_target == null)
+                RotateToDirection(moveDirection);
         }
 
-        public PlayerSaveData GetSaveData()
+        public void EquipItem(int invetoryCellId)
         {
-            return new PlayerSaveData(_equipedWeapon?.InventoryItemId, transform.position, _stats, _inventory.Items);
-        }
-
-        public void EquipItem(int invetoryItemId)
-        {
-            var item = _inventory.Items.FirstOrDefault(x => x.Id == invetoryItemId);
+            var item = _inventory.Cells.FirstOrDefault(x => x.Id == invetoryCellId);
             if (item == null)
                 return;
 
-            if (item.Asset is WeaponAsset)
+            if (item.ItemDefinition is WeaponDefinition)
             {
                 RemoveWeapon();
                 EquipWeapon(item);
@@ -104,9 +89,20 @@ namespace ClubTest
             }
         }
 
-        public void PickUpItem(DropedItem dropedItem)
+        public void RemoveItem(int inventoryCellId)
         {
-            _inventory.Add(dropedItem.Item, dropedItem.Amount);
+            var item = _inventory.Cells.FirstOrDefault(x => x.Id == inventoryCellId);
+            if (item == null)
+                return;
+
+            if (item.ItemDefinition is WeaponDefinition)
+            {
+                if (_equipedWeapon?.InventoryCellId == inventoryCellId)
+                {
+                    RemoveWeapon();
+                    return;
+                }
+            }
         }
 
         public override void TakeDamage(float damage)
@@ -114,19 +110,35 @@ namespace ClubTest
             _stats.Healf.Remove(damage);
         }
 
+        public PlayerSaveData GetSaveData()
+        {
+            return new PlayerSaveData()
+            {
+                Stats = _stats,
+                Inventory = _inventory.Cells.Select(x =>
+                    new InventoryCellData()
+                    {
+                        Id = x.Id,
+                        Amount = x.Amount,
+                        ItemDefinitionId = x.ItemDefinition.Id
+                    })
+                .ToList(),
+                EquipedItemsInventoryId = new List<int>()
+                {
+                    _equipedWeapon.InventoryCellId
+                }
+            };
+        }
+
         protected override void Die()
         {
-            Destroy(gameObject);
+            RemoveWeapon();
+            Died?.Invoke(this);
         }
 
-        protected override void Move(Vector2 offsetPosition)
+        private void EquipWeapon(InventoryCell weaponItem)
         {
-            _rigidbody.MovePosition(_rigidbody.position + offsetPosition);
-        }
-
-        private void EquipWeapon(InventoryItem weaponItem)
-        {
-            var asset = weaponItem.Asset as WeaponAsset;
+            var asset = weaponItem.ItemDefinition as WeaponDefinition;
             var view = Instantiate(asset.View);
             _view.EquipWeapon(view);
             _equipedWeapon = new Weapon(weaponItem.Id, asset.Stats, view);
@@ -139,13 +151,13 @@ namespace ClubTest
             _view.RemoveEquipedWeapon();
         }
 
-        private void HandleRotation(Vector2 moveDirection)
+        private void RotateToDirection(Vector2 direction)
         {
-            if (moveDirection.x == 0)
+            if (direction.x == 0)
                 return;
 
             var currentRotationYIsPositive = _view.transform.rotation.eulerAngles.y == 0;
-            var directionIsPositive = moveDirection.x > 0;
+            var directionIsPositive = direction.x > 0;
             if (currentRotationYIsPositive == directionIsPositive)
                 return;
 
@@ -154,18 +166,12 @@ namespace ClubTest
             _view.transform.rotation = Quaternion.Euler(currentAngle.x, targetAngleY, currentAngle.z);
         }
 
-        private async UniTaskVoid StartSearchEnemies(CancellationToken cancellationToken)
-        {
-            while (cancellationToken.IsCancellationRequested == false)
-            {
-                var enemies = _unitDetector.GetComponentsAround<Enemy>(transform.position, _stats.FOVRadius, CONSTANTS.EnemyMask).ToList();
-                _target = enemies.GetClosestToPoint(transform.position);
-                await UniTask.Delay(CONSTANTS.UNIT_DETECTION_INTERVAL, cancellationToken: cancellationToken);
-            }
-        }
-
         private async UniTaskVoid StartAttack(CancellationToken cancellationToken)
         {
+            Func<InventoryCell, bool> predicate = (cell) =>
+                cell.ItemDefinition is BulletDefinition bullet &&
+                bullet.Caliber == _equipedWeapon.BulletCaliber;
+
             while (cancellationToken.IsCancellationRequested == false)
             {
                 if (_equipedWeapon == null || _target == null)
@@ -174,12 +180,9 @@ namespace ClubTest
                     continue;
                 }
 
-                var inventoryBullet = _inventory.Items.FirstOrDefault(x =>
-                    x.Asset is BulletAsset asset &&
-                    asset.Caliber == _equipedWeapon.BulletCaliber &&
-                    x.Amount > 0);
+                var bulletCells = _inventory.Cells.Where(predicate);
 
-                if (inventoryBullet == null)
+                if (bulletCells.Any() == false || bulletCells.Sum(x => x.Amount) < _equipedWeapon.BulletsPerShoot)
                 {
                     await UniTask.NextFrame();
                     continue;
@@ -188,17 +191,11 @@ namespace ClubTest
                 var isShooted = await _equipedWeapon.TryShoot(_target.transform.position);
                 if (isShooted)
                 {
-                    _inventory.Remove(inventoryBullet.Id, 1);
+                    _inventory.Remove(predicate, _equipedWeapon.BulletsPerShoot);
                 }
 
                 await UniTask.NextFrame();
             }
-        }
-
-        private void StopSearchEnemies()
-        {
-            _searchTokenSource.Cancel();
-            _searchTokenSource = new CancellationTokenSource();
         }
 
         private void StopAttack()
@@ -207,10 +204,19 @@ namespace ClubTest
             _attackTokenSource = new CancellationTokenSource();
         }
 
-        private void OnDeleteRequested(int itemId, int amount)
+        private void OnShoot(InputAction.CallbackContext context)
         {
-            if (_equipedWeapon?.InventoryItemId == itemId)
-                RemoveWeapon();
+            if (context.started)
+                StartAttack(_attackTokenSource.Token).Forget();
+            if (context.canceled)
+                StopAttack();
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position, _stats.FOVDistance);
+            Gizmos.color = Color.white;
         }
     }
 }

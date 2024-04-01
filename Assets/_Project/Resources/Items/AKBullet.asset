@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9bfc5df81a70a348b84396df5ce8031, type: 3}
   m_Name: AKBullet
   m_EditorClassIdentifier: 
-  <Id>k__BackingField: 0
+  <Id>k__BackingField: 3
   <Name>k__BackingField: Bullet
   <Icon>k__BackingField: {fileID: 21300000, guid: d45f0cae013abb84688afe6e4bc52845, type: 3}
   <MaxInStack>k__BackingField: 99

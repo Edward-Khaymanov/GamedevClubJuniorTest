@@ -1,24 +1,20 @@
 ﻿using UnityEngine;
-using Zenject;
 
 namespace ClubTest
 {
     public class PlayerFactory
     {
-        private readonly DiContainer _diContainer;
         private readonly Player _playerTemplate;
 
-        [Inject]
-        public PlayerFactory(DiContainer diContainer, Player playerTemplate)
+        public PlayerFactory(Player playerTemplate)
         {
-            _diContainer = diContainer;
             _playerTemplate = playerTemplate;
         }
 
-        public Player Spawn(PlayerData playerData, Vector2 position)
+        public Player Spawn(PlayerSaveData playerData, Inventory inventory, IPlayerInput input, Vector2 position)
         {
-            var player = _diContainer.InstantiatePrefabForComponent<Player>(_playerTemplate, position, Quaternion.identity, null);
-            player.Init(playerData);
+            var player = GameObject.Instantiate(_playerTemplate, position, Quaternion.identity);
+            player.Init(playerData, inventory, input);
             return player;
         }
     }

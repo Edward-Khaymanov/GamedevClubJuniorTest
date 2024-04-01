@@ -3,7 +3,7 @@
 namespace ClubTest
 {
     [CreateAssetMenu(menuName = "_Project/Items/Bullet")]
-    public class BulletAsset : ItemAsset
+    public class BulletDefinition : ItemDefinition
     {
         [field: SerializeField] public BulletCaliber Caliber { get; set; }
     }

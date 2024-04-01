@@ -4,9 +4,9 @@ using UnityEngine;
 namespace ClubTest
 {
     [Serializable]
-    public class DropedItem
+    public class ItemAmount
     {
-        [field: SerializeField] public ItemAsset Item { get; set; }
+        [field: SerializeField] public ItemDefinition Item { get; set; }
         [field: SerializeField, Min(1)] public int Amount { get; set; }
     }
 }

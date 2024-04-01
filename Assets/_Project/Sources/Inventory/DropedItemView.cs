@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace ClubTest
 {
@@ -6,24 +7,20 @@ namespace ClubTest
     {
         [SerializeField] private SpriteRenderer _iconSource;
 
-        private DropedItem _drop;
+        private ItemAmount _drop;
+
+        public event Action<DropedItemView, ItemAmount> PickedUp;
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.TryGetComponent(out Player player) == false)
                 return;
 
-            if (_drop != null)
-                player.PickUpItem(_drop);
-
-            Destroy(gameObject);
+            PickedUp?.Invoke(this, _drop);
         }
 
-        public void Init(DropedItem drop)
+        public void Init(ItemAmount drop)
         {
-            if (drop == null)
-                return;
-
             _drop = drop;
             _iconSource.sprite = drop.Item.Icon;
         }

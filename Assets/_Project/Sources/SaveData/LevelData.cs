@@ -8,7 +8,7 @@ namespace ClubTest
     public class LevelData : ScriptableObject
     {
         [field: SerializeField] public SerializedDictionary<EnemyType, int> EnemyTypeAmountToSpawn { get; private set; }
-        [field: SerializeField] public SerializedDictionary<EnemyType, List<DropedItem>> EnemyDropList { get; private set; }
+        [field: SerializeField] public SerializedDictionary<EnemyType, List<ItemAmount>> EnemyDropList { get; private set; }
 
     }
 }

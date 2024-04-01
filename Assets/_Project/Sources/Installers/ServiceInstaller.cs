@@ -12,8 +12,7 @@ namespace ClubTest
 
         private void BindItemService()
         {
-            var service = new ItemService();
-            service.Initialize();
+            var service = new ItemService(CONSTANTS.ITEMS_PATH);
             Container
                 .Bind<ItemService>()
                 .FromInstance(service)
@@ -23,9 +22,10 @@ namespace ClubTest
 
         private void BindSaveLoadService()
         {
+            var service = new SaveLoadService();
             Container
                 .Bind<SaveLoadService>()
-                .FromInstance(new SaveLoadService())
+                .FromInstance(service)
                 .AsSingle()
                 .NonLazy();
         }

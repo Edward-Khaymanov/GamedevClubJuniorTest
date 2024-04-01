@@ -6,21 +6,22 @@ namespace ClubTest
 {
     public class Weapon
     {
-        private readonly int _inventoryItemId;
+        private readonly int _inventoryCellId;
         private readonly WeaponStats _weaponStats;
         private readonly WeaponView _weaponView;
         private bool _isOnAttackDelay;
 
-        public Weapon(int itemId, WeaponStats weaponStats, WeaponView weaponView)
+        public Weapon(int inventoryCellId, WeaponStats weaponStats, WeaponView weaponView)
         {
-            _inventoryItemId = itemId;
+            _inventoryCellId = inventoryCellId;
             _weaponStats = weaponStats;
             _weaponView = weaponView;
         }
 
-        public int InventoryItemId => _inventoryItemId;
+        public int InventoryCellId => _inventoryCellId;
 
         public BulletCaliber BulletCaliber => _weaponStats.Caliber;
+        public int BulletsPerShoot => _weaponStats.BulletsPerShoot;
 
         public async UniTask<bool> TryShoot(Vector3 targetPosition)
         {

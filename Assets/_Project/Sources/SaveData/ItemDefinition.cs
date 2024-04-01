@@ -2,7 +2,7 @@
 
 namespace ClubTest
 {
-    public abstract class ItemAsset : ScriptableObject
+    public abstract class ItemDefinition : ScriptableObject
     {
         [field: SerializeField] public int Id { get; set; }
         [field: SerializeField] public string Name { get; set; }

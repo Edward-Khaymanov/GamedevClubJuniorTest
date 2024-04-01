@@ -148,7 +148,7 @@ GameObject:
   - component: {fileID: 6666880216364966751}
   - component: {fileID: 6666880216364966750}
   m_Layer: 5
-  m_Name: InventoryItemView
+  m_Name: InventoryCellView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -185,7 +185,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6666880216364966747}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a80e2db99f5743b42818a836c4817c29, type: 3}
+  m_Script: {fileID: 11500000, guid: a6f30eafb7749ce499fc47f9f7668f58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _itemIcon: {fileID: 6666880216570662061}
@@ -294,7 +294,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d45f0cae013abb84688afe6e4bc52845, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1d6f11f3931f6a84daa827782fc3ea6a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

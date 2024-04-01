@@ -3,7 +3,7 @@ using Zenject;
 
 namespace ClubTest
 {
-    public class PlayerInstaller : MonoInstaller
+    public class PlayerFactoryInstaller : MonoInstaller
     {
         [SerializeField] private Player _playerTemplate;
 
@@ -14,11 +14,11 @@ namespace ClubTest
 
         private void BindPlayerFactory()
         {
+            var factory = new PlayerFactory(_playerTemplate);
             Container
                 .Bind<PlayerFactory>()
-                .To<PlayerFactory>()
+                .FromInstance(factory)
                 .AsSingle()
-                .WithArguments(_playerTemplate)
                 .NonLazy();
         }
     }

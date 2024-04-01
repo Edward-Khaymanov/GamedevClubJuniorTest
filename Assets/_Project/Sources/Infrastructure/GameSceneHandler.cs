@@ -147,9 +147,8 @@ namespace ClubTest
 
         private void ShowDeathScreen()
         {
-
+            _saveButton.interactable = false;
         }
-
 
         private void OnEnemyDeath(Enemy enemy)
         {
@@ -174,6 +173,8 @@ namespace ClubTest
             _input.Disable();
             _inventoryView.Hide();
             GameObject.Destroy(player.gameObject);
+            var defaultSave = _saveLoadService.LoadPlayerDefault();
+            _saveLoadService.SavePlayer(defaultSave);
             ShowDeathScreen();
         }
     }

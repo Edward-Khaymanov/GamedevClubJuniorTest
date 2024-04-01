@@ -407,8 +407,8 @@ MonoBehaviour:
       <Healf>k__BackingField:
         <Max>k__BackingField: 500
         <Current>k__BackingField: 500
-      <FOVDistance>k__BackingField: 2.5
-      <MoveSpeed>k__BackingField: 2
+      <FOVDistance>k__BackingField: 3
+      <MoveSpeed>k__BackingField: 4
 --- !u!50 &-1713061700946478062
 Rigidbody2D:
   serializedVersion: 4

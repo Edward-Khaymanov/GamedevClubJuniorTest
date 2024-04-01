@@ -15,11 +15,11 @@
         }
     ],
     "Stats": {
-        "FOVDistance": 3.0,
+        "FOVDistance": 5.0,
         "Healf": {
             "Current": 500.0,
             "Max": 500.0
         },
-        "MoveSpeed": 5.0
+        "MoveSpeed": 6.0
     }
 }

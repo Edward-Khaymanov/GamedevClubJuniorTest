@@ -91,18 +91,8 @@ namespace ClubTest
 
         public void RemoveItem(int inventoryCellId)
         {
-            var item = _inventory.Cells.FirstOrDefault(x => x.Id == inventoryCellId);
-            if (item == null)
-                return;
-
-            if (item.ItemDefinition is WeaponDefinition)
-            {
-                if (_equipedWeapon?.InventoryCellId == inventoryCellId)
-                {
-                    RemoveWeapon();
-                    return;
-                }
-            }
+            if (_equipedWeapon?.InventoryCellId == inventoryCellId)
+                RemoveWeapon();
         }
 
         public override void TakeDamage(float damage)
@@ -112,7 +102,7 @@ namespace ClubTest
 
         public PlayerSaveData GetSaveData()
         {
-            return new PlayerSaveData()
+            var result = new PlayerSaveData()
             {
                 Stats = _stats,
                 Inventory = _inventory.Cells.Select(x =>
@@ -124,10 +114,12 @@ namespace ClubTest
                     })
                 .ToList(),
                 EquipedItemsInventoryId = new List<int>()
-                {
-                    _equipedWeapon.InventoryCellId
-                }
             };
+
+            if (_equipedWeapon != null)
+                result.EquipedItemsInventoryId.Add(_equipedWeapon.InventoryCellId);
+
+            return result;
         }
 
         protected override void Die()
@@ -214,6 +206,9 @@ namespace ClubTest
 
         private void OnDrawGizmos()
         {
+            if (_stats == null) 
+                return;
+
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(transform.position, _stats.FOVDistance);
             Gizmos.color = Color.white;

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace ClubTest
 {
@@ -144,6 +141,8 @@ namespace ClubTest
         private void DeleteSaveData()
         {
             _saveLoadService.DeletePlayer();
+            var defaultSave = _saveLoadService.LoadPlayerDefault();
+            _saveLoadService.SavePlayer(defaultSave);
         }
 
         private void ShowDeathScreen()
